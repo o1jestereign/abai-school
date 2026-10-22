@@ -340,9 +340,9 @@
     // Determine current default URL
     const curOrigin = window.location.origin;
     const curPath = window.location.pathname.replace(/\/[^/]*$/, '/');
-    let defaultBase = curOrigin.startsWith('http') 
+    let defaultBase = curOrigin.startsWith('http') && !curOrigin.includes('localhost')
       ? (curOrigin + curPath) 
-      : 'https://abai-school.github.io/';
+      : 'https://o1jestereign.github.io/abai-school/';
     if (!defaultBase.endsWith('/')) defaultBase += '/';
 
     const inputUrl = document.getElementById('base-url');
