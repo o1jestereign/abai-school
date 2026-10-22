@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QR Кодтар генераторы — Абай мектебі</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    body {
+      overflow-y: auto !important;
+      background: #0b1224;
+      color: #e2e8f0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      padding: 24px 16px 80px;
+    }
+    .container {
+      max-width: 1040px;
+      margin: 0 auto;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+    .header h1 {
+      font-size: 28px;
+      font-weight: 800;
+      color: #38bdf8;
+      margin-bottom: 6px;
+    }
+    .header p {
+      color: #94a3b8;
+      font-size: 15px;
+      max-width: 650px;
+      margin: 0 auto;
+    }
+    .url-panel {
+      background: rgba(15, 23, 42, 0.75);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      border-radius: 18px;
+      padding: 20px;
+      backdrop-filter: blur(12px);
+      margin-bottom: 32px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    }
+    .url-panel label {
+      display: block;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: #7dd3fc;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .url-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .url-input {
+      flex: 1;
+      min-width: 280px;
+      background: rgba(2, 6, 23, 0.8);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      color: #f8fafc;
+      font-size: 15px;
+      padding: 12px 16px;
+      border-radius: 12px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .url-input:focus {
+      border-color: #38bdf8;
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
+    }
+    .btn {
+      background: linear-gradient(135deg, #0284c7, #06b6d4);
+      color: #fff;
+      border: none;
+      padding: 12px 22px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 14.5px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: 0.2s;
+    }
+    .btn:hover {
+      filter: brightness(1.15);
+      transform: translateY(-1px);
+    }
+    .btn-secondary {
+      background: rgba(30, 41, 59, 0.85);
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      color: #cbd5e1;
+    }
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+    }
+    .poster-card {
+      background: #ffffff;
+      color: #0f172a;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 0 0 20px 0;
+      transition: transform 0.2s;
+    }
+    .poster-card:hover {
+      transform: translateY(-4px);
+    }
+    .card-top {
+      width: 100%;
+      background: #0284c7;
+      color: #ffffff;
+      padding: 18px 14px;
+      text-align: center;
+    }
+    .card-top.entrance { background: #0284c7; }
+    .card-top.cafe { background: #d97706; }
+    .card-top.assembly { background: #7c3aed; }
+    .card-top.gym { background: #059669; }
+    .card-top.library { background: #0891b2; }
+    .card-school {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      opacity: 0.9;
+    }
+    .card-title {
+      font-size: 18px;
+      font-weight: 800;
+      margin: 4px 0 2px;
+      font-family: 'Outfit', sans-serif;
+    }
+    .card-sub {
+      font-size: 12px;
+      opacity: 0.85;
+    }
+    .qr-box {
+      margin: 22px 0 14px;
+      padding: 12px;
+      background: #f8fafc;
+      border: 2px dashed #cbd5e1;
+      border-radius: 16px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 200px;
+      min-width: 200px;
+    }
+    .qr-box canvas, .qr-box img {
+      display: block;
+      width: 190px !important;
+      height: 190px !important;
+    }
+    .card-instructions {
+      text-align: center;
+      padding: 0 16px;
+    }
+    .inst-main {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #0f172a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .inst-sub {
+      font-size: 11.5px;
+      color: #64748b;
+      margin-top: 2px;
+    }
+    .card-url {
+      margin-top: 14px;
+      padding: 6px 12px;
+      background: #f1f5f9;
+      border-radius: 8px;
+      font-size: 11px;
+      color: #475569;
+      max-width: 90%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-family: monospace;
+    }
+    .card-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 14px;
+    }
+    .act-btn {
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #334155;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .act-btn:hover {
+      background: #e2e8f0;
+      color: #0f172a;
+    }
+
+    /* PRINT STYLES (A4) */
+    @media print {
+      body {
+        background: #ffffff !important;
+        color: #000000 !important;
+        padding: 0 !important;
+      }
+      .header, .url-panel, .card-actions, .top-nav {
+        display: none !important;
+      }
+      .cards-grid {
+        display: block !important;
+      }
+      .poster-card {
+        page-break-after: always;
+        break-after: page;
+        box-shadow: none !important;
+        border: 2px solid #000 !important;
+        border-radius: 0 !important;
+        width: 100% !important;
+        max-width: 650px !important;
+        margin: 40px auto !important;
+        padding-bottom: 40px !important;
+      }
+      .qr-box {
+        border: 2px solid #000 !important;
+        padding: 20px !important;
+        margin: 40px 0 !important;
+      }
+      .qr-box canvas, .qr-box img {
+        width: 320px !important;
+        height: 320px !important;
+      }
+      .card-title {
+        font-size: 28px !important;
+      }
+      .inst-main {
+        font-size: 18px !important;
+      }
+      .inst-sub {
+        font-size: 14px !important;
+      }
+      .card-url {
+        font-size: 13px !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="top-nav" style="margin-bottom: 20px;">
+      <a href="index.html" class="act-btn" style="color: #38bdf8; border-color: rgba(56,189,248,0.3); background: rgba(15,23,42,0.8);">
+        ← Мектептің 2D Картасына оралу
+      </a>
+    </div>
+
+    <div class="header">
+      <h1>📷 QR Кодтар генераторы және Басып шығару (A4)</h1>
+      <p>
+        Осы QR-кодтарды мектептің кіреберісіне, асханасына және залдарына іліп қойсаңыз, оқушылар телефон камерасымен сканерлегенде мектеп картасы бірден сол орыннан ашылады!
+      </p>
+    </div>
+
+    <div class="url-panel">
+      <label for="base-url">🌐 Сіздің сайт немесе GitHub Pages сілтемесі:</label>
+      <div class="url-row">
+        <input id="base-url" class="url-input" type="url" 
+               placeholder="Мысалы: https://sizdin-akkount.github.io/abai-school/" />
+        <button id="btn-update" class="btn">Жаңарту</button>
+        <button id="btn-print" class="btn btn-secondary">🖨️ A4 Басып шығару (Печать)</button>
+      </div>
+      <div style="font-size: 12px; color: #94a3b8; margin-top: 8px;">
+        💡 Егер жобаңыз әлі серверге салынбаса, жоғарыдағы сілтемеге өз GitHub адресіңізді жазсаңыз болғаны. Барлық QR автоматты түрде өзгереді.
+      </div>
+    </div>
+
+    <div class="cards-grid" id="cards-container">
+      <!-- Generated dynamically -->
+    </div>
+  </div>
+
+  <script src="js/vendor/qrcode.min.js"></script>
+  <script>
+    const SPOTS = [
+      {
+        id: 'entrance',
+        cls: 'entrance',
+        title: 'БАСТЫ КІРЕБЕРІС',
+        sub: '1-қабат · Орталық вестибюль / Гардероб',
+        icon: '🚪'
+      },
+      {
+        id: 'cafe',
+        cls: 'cafe',
+        title: 'МЕКТЕП АСХАНАСЫ',
+        sub: '1-қабат · Батыс қанат',
+        icon: '🍽️'
+      },
+      {
+        id: 'assembly',
+        cls: 'assembly',
+        title: 'АКТОВЫЙ ЗАЛ',
+        sub: '1-қабат · Мәжіліс залы',
+        icon: '🎭'
+      },
+      {
+        id: 'gym',
+        cls: 'gym',
+        title: 'СПОРТ ЗАЛЫ',
+        sub: '2-қабат · Үлкен спорт кешені',
+        icon: '🏀'
+      },
+      {
+        id: 'library',
+        cls: 'library',
+        title: 'КІТАПХАНА ЖӘНЕ ОҚУ ЗАЛЫ',
+        sub: '3-қабат · Орталық оқу коворкингі',
+        icon: '📚'
+      }
+    ];
+
+    // Determine current default URL
+    const curOrigin = window.location.origin;
+    const curPath = window.location.pathname.replace(/\/[^/]*$/, '/');
+    let defaultBase = curOrigin.startsWith('http') 
+      ? (curOrigin + curPath) 
+      : 'https://abai-school.github.io/';
+    if (!defaultBase.endsWith('/')) defaultBase += '/';
+
+    const inputUrl = document.getElementById('base-url');
+    inputUrl.value = defaultBase;
+
+    function renderCards() {
+      let base = inputUrl.value.trim();
+      if (!base) base = 'https://abai-school.github.io/';
+      if (!base.endsWith('/')) base += '/';
+
+      const container = document.getElementById('cards-container');
+      container.innerHTML = '';
+
+      SPOTS.forEach(s => {
+        const fullUrl = `${base}?spot=${s.id}`;
+        
+        const card = document.createElement('div');
+        card.className = 'poster-card';
+
+        card.innerHTML = `
+          <div class="card-top ${s.cls}">
+            <div class="card-school">Абай атындағы мектеп (Қызылорда)</div>
+            <div class="card-title">${s.icon} ${s.title}</div>
+            <div class="card-sub">${s.sub}</div>
+          </div>
+          <div class="qr-box" id="qr-${s.id}"></div>
+          <div class="card-instructions">
+            <div class="inst-main">📷 Телефон камерасымен сканерлеңіз</div>
+            <div class="inst-sub">Мектеп картасы осы орыннан бастап бірден ашылады</div>
+          </div>
+          <div class="card-url" title="${fullUrl}">${fullUrl}</div>
+          <div class="card-actions">
+            <a href="${fullUrl}" target="_blank" class="act-btn">🔗 Тексеру</a>
+            <button class="act-btn" onclick="downloadQR('${s.id}', '${s.title}')">💾 PNG сақтау</button>
+          </div>
+        `;
+
+        container.appendChild(card);
+
+        // Generate QR code
+        new QRCode(document.getElementById(`qr-${s.id}`), {
+          text: fullUrl,
+          width: 200,
+          height: 200,
+          colorDark: "#000000",
+          colorLight: "#ffffff",
+          correctLevel: QRCode.CorrectLevel.H
+        });
+      });
+    }
+
+    window.downloadQR = function(id, title) {
+      const box = document.getElementById(`qr-${id}`);
+      const canvas = box.querySelector('canvas') || box.querySelector('img');
+      if (!canvas) return;
+
+      const a = document.createElement('a');
+      a.download = `QR_${title.replace(/\s+/g, '_')}.png`;
+      a.href = canvas.toDataURL ? canvas.toDataURL('image/png') : canvas.src;
+      a.click();
+    };
+
+    document.getElementById('btn-update').onclick = renderCards;
+    inputUrl.addEventListener('keypress', (e) => { if (e.key === 'Enter') renderCards(); });
+    document.getElementById('btn-print').onclick = () => window.print();
+
+    renderCards();
+  </script>
+</body>
+</html>

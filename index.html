@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <title>Абай мектебі — 2D ішкі навигация | Digital Twin</title>
+  <meta name="description" content="Абай атындағы дарынды балаларға арналған мектеп (Қызылорда): 3 қабатты 2D ішкі навигация ойыны, іздеу, маршрут және QR сканер." />
+  <meta name="theme-color" content="#0f172a" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <main id="app" class="app">
+    <canvas id="map" aria-label="Мектеп картасы"></canvas>
+
+    <!-- TOP HUD -->
+    <header class="hud-top">
+      <div class="top-row">
+        <div id="location-pill" class="glass pill" role="status" aria-live="polite">
+          <span class="pill-dot"></span>
+          <span id="location-text">📍 Жүктелуде…</span>
+        </div>
+        <div class="floor-selector glass" role="tablist" aria-label="Қабат таңдау">
+          <button class="floor-btn active" data-floor="1" id="fbtn-1" aria-label="1-қабат">1</button>
+          <button class="floor-btn" data-floor="2" id="fbtn-2" aria-label="2-қабат">2</button>
+          <button class="floor-btn" data-floor="3" id="fbtn-3" aria-label="3-қабат">3</button>
+        </div>
+      </div>
+
+      <div class="search glass" id="search-box">
+        <span class="search-ico">🔎</span>
+        <input id="search-input" type="search" autocomplete="off" spellcheck="false"
+               placeholder="Кабинетті немесе орынды іздеу... мысалы: Актовый зал, 123 кабинет, Дәретхана" />
+        <button id="search-clear" class="icon-btn small hidden" aria-label="Тазалау">✕</button>
+        <ul id="search-results" class="results hidden" role="listbox"></ul>
+      </div>
+
+      <div id="hint" class="hint glass hidden"></div>
+    </header>
+
+    <!-- ROUTE CARD -->
+    <aside id="route-card" class="glass route-card hidden">
+      <div class="route-main">
+        <div class="route-title" id="route-title">—</div>
+        <div class="route-sub" id="route-sub">—</div>
+      </div>
+      <button id="route-cancel" class="icon-btn small" aria-label="Маршрутты тоқтату">✕</button>
+    </aside>
+
+    <!-- RIGHT CONTROLS -->
+    <div class="ctrl-right">
+      <button id="zoom-in" class="glass icon-btn" aria-label="Жақындату">+</button>
+      <button id="zoom-out" class="glass icon-btn" aria-label="Алшақтату">−</button>
+      <button id="recenter" class="glass icon-btn" aria-label="Ойыншыға оралу">◎</button>
+    </div>
+
+    <!-- STAIRS PANEL -->
+    <section id="stairs-panel" class="glass stairs-panel hidden" aria-label="Баспалдақ">
+      <div class="stairs-title">🪜 Баспалдақ алаңы</div>
+      <div class="stairs-btns">
+        <button id="btn-up" class="stair-btn up">🔼 Жоғарғы қабатқа шығу</button>
+        <button id="btn-down" class="stair-btn down">🔽 Төменгі қабатқа түсу</button>
+      </div>
+    </section>
+
+    <!-- JOYSTICK -->
+    <div id="joystick" class="joystick" aria-label="Джойстик">
+      <div class="joy-ring"></div>
+      <div id="joy-knob" class="joy-knob"></div>
+    </div>
+
+    <!-- QR BUTTON -->
+    <button id="qr-btn" class="qr-btn" aria-label="QR сканерлеу">📷 <span>QR Сканерлеу</span></button>
+
+    <!-- ELEVATOR TRANSITION -->
+    <div id="fade" class="fade"><div class="fade-text" id="fade-text"></div></div>
+
+    <!-- TOAST -->
+    <div id="toast" class="toast glass hidden"></div>
+
+    <!-- QR MODAL -->
+    <div id="qr-modal" class="modal hidden" role="dialog" aria-modal="true" aria-label="QR Сканер">
+      <div class="modal-card glass">
+        <div class="modal-head">
+          <h1>📷 QR Сканерлеу</h1>
+          <button id="qr-close" class="icon-btn small" aria-label="Жабу">✕</button>
+        </div>
+        <div id="qr-reader" class="qr-reader"></div>
+        <div id="qr-status" class="qr-status">Камераны іске қосу үшін батырманы басыңыз</div>
+        <button id="qr-start" class="primary-btn">Камераны қосу</button>
+        <h2 class="sim-title">⚡ Тест үшін жылдам телепорт (Симуляция)</h2>
+        <div id="sim-list" class="sim-list"></div>
+        <a href="qr_generator.html" target="_blank" style="display:block; text-align:center; font-size:13px; color:#38bdf8; text-decoration:none; padding:10px 0 4px; font-weight:600;">🖨️ Қабырғаға ілетін QR кодтарды ашу / басып шығару (A4) ↗</a>
+      </div>
+    </div>
+  </main>
+
+  <script src="js/vendor/html5-qrcode.min.js"></script>
+  <script src="js/mapdata.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

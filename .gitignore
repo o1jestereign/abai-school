@@ -1,0 +1,16 @@
+# Binary & large temporary files
+python_portable/
+python_portable.zip
+*.pdf
+plan_page*.png
+
+# Logs and cache
+*.log
+__pycache__/
+.system_generated/
+
+# OS and Editor files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
