@@ -1,7 +1,8 @@
 const fs = require('fs'), path = require('path');
 const root = path.join(__dirname, '..');
 const el = () => new Proxy(function () {}, { get: (t, k) => k === 'classList' ? { add() {}, remove() {}, toggle() {}, contains: () => false } : k === 'style' ? {} : k === 'getContext' ? () => new Proxy({}, { get: () => () => ({ addColorStop() {} }) , set: () => true }) : k === 'getBoundingClientRect' ? () => ({ left: 0, top: 0, width: 100, height: 100 }) : (k === 'appendChild' || k === 'addEventListener' || k === 'setPointerCapture') ? () => {} : undefined, set: () => true, apply: () => undefined });
-global.window = global; global.document = { getElementById: el, createElement: el, activeElement: null };
+global.window = global; global.document = { getElementById: el, createElement: el, activeElement: null, addEventListener: () => {} };
+global.location = { search: '', hash: '' };
 global.addEventListener = () => {}; global.innerWidth = 400; global.innerHeight = 800; global.devicePixelRatio = 1;
 global.requestAnimationFrame = () => {}; global.Image = function () { this.complete = true; };
 global.atob = (s) => Buffer.from(s, 'base64').toString('binary');
@@ -17,18 +18,19 @@ const f = g.dijkstraField(fl, g.S.x, g.S.y);
 let fin = 0; for (const v of f) if (isFinite(v)) fin++;
 console.log('field ms', Date.now() - t0, 'finite cells', fin, 'clr@start', fl.clr[g.S.y * fl.gw + g.S.x]);
 const destinations = [
-  [1, 'Асхана'],
-  [1, 'Актовый зал'],
-  [1, 'Орталық вестибюль / Гардероб'],
+  [1, '1 Спортзал'],
+  [1, '2 Асхана'],
+  [1, '3 Кітапхана'],
+  [1, '4 Акт залы'],
+  [1, '5 Медициналық кабинет'],
+  [1, '6 Баспалдақ'],
   [1, '105 кабинет'],
   [2, 'Спорт залы (Үлкен зал)'],
   [2, 'Мұғалімдер залы (Учительская)'],
   [2, '204 кабинет'],
-  [2, 'Ұлдар дәретханасы 2.1'],
   [3, 'Кітапхана және оқу залы'],
   [3, 'IT зертханасы және бағдарламалау'],
-  [3, '305 кабинет'],
-  [3, 'Қыздар дәретханасы 3.2']
+  [3, '305 кабинет']
 ];
 for (const [fo, n] of destinations) {
   t0 = Date.now();
@@ -38,5 +40,5 @@ for (const [fo, n] of destinations) {
   console.log(n, fo, r ? r.segs.map((s) => `${s.floor}:${s.pts.length}${s.endsAtStair ? '->' + s.toFloor : ''}`).join(' | ') + ' cost ' + Math.round(r.cost) : 'NO ROUTE', Date.now() - t0, 'ms');
 }
 const s0 = g.floors[2].stairs[0];
-const r = g.planRoute(3, s0.x, s0.y, { floor: 1, x: z(1, 'Негізгі кіреберіс').cx, y: z(1, 'Негізгі кіреберіс').cy });
+const r = g.planRoute(3, s0.x, s0.y, { floor: 1, x: z(1, '7 Сіз осындасыз (Басты кіреберіс)').cx, y: z(1, '7 Сіз осындасыз (Басты кіреберіс)').cy });
 console.log('3->1', r && r.segs.map((s) => `${s.floor}:${s.pts.length}->${s.toFloor}`).join(' | '));

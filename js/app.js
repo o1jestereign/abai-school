@@ -208,13 +208,21 @@ function refreshRoute(force) {
   const now = performance.now();
   if (!force) {
     const seg = S.route && S.route.segs[0];
-    const onPath = seg && seg.floor === S.floor && nearestSeg(seg.pts, S.x, S.y).d < 6;
-    if (onPath && now - S.lastRouteAt < 4000) return;   // cheap: keep following the existing path
+    const onPath = seg && seg.floor === S.floor && nearestSeg(seg.pts, S.x, S.y).d < 8;
+    if (onPath && now - S.lastRouteAt < 4500) return;   // keep following existing path smoothly
     if (now - S.lastRouteAt < 400) return;
   }
   S.lastRouteAt = now;
   const r = planRoute(S.floor, S.x, S.y, S.target);
-  if (!r) { S.route = null; showToast('Маршрут табылмады 😕'); S.target = null; $('route-card').classList.add('hidden'); return; }
+  if (!r) {
+    if (force || !S.route) {
+      S.route = null;
+      showToast('Маршрут табылмады 😕');
+      S.target = null;
+      $('route-card').classList.add('hidden');
+    }
+    return;
+  }
   S.route = r; const seg = r.segs[0]; seg.m = segLen(seg.pts);
   $('route-card').classList.remove('hidden');
   $('route-title').textContent = '➜ ' + S.target.label;
@@ -667,9 +675,16 @@ addEventListener('resize', resize); resize();
 function drawRoute(z, t) {
   const seg = S.route && S.route.segs[0]; if (!seg || seg.floor !== S.floor) return;
   const pts = seg.pts; if (pts.length < 2) return;
-  // trim passed part
+  // trim passed part smoothly
   const ns = nearestSeg(pts, S.x, S.y);
-  const full = [[S.x, S.y], ...pts.slice(ns.i + 1)]; seg.m = segLen(full);
+  let full;
+  if (ns.i < pts.length - 1 && ns.d < 16) {
+    full = [[S.x, S.y], ...pts.slice(ns.i + 1)];
+  } else {
+    full = pts;
+  }
+  if (full.length < 2) full = [[S.x, S.y], pts[pts.length - 1]];
+  seg.m = segLen(full);
   ctx.save(); ctx.lineJoin = 'round'; ctx.lineCap = 'round';
   const path = () => { ctx.beginPath(); full.forEach((p, i) => i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1])); };
   path(); ctx.strokeStyle = 'rgba(52,211,153,.22)'; ctx.lineWidth = 7 / z * 1.5 + 2.6; ctx.shadowColor = '#34d399'; ctx.shadowBlur = 22; ctx.stroke();

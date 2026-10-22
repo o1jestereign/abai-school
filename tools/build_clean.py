@@ -172,43 +172,60 @@ def build_floor_clean(floor, page):
     # 2. Enclosed bridge between wings
     bridge = np.zeros_like(m)
     if floor == 1:
-        bridge[182:188, 170:235] = True
-    elif floor == 2:
-        bridge[195:202, 170:255] = True
-    elif floor == 3:
-        bridge[195:202, 170:255] = True
+        bridge[182:206, 170:240] = True
+    elif floor in (2, 3):
+        bridge[195:206, 170:258] = True
     footprint |= bridge
     
     # 3. Base walkable space: interior of footprint where m is False
     walk = (footprint & ~m) | bridge
     
     # 4. Open real doorways connecting every interior space into the main network
+    def carve_capsule(p1, p2, r=2.2):
+        y1, x1 = p1
+        y2, x2 = p2
+        dx, dy = x2 - x1, y2 - y1
+        L2 = dx * dx + dy * dy
+        if L2 == 0:
+            return (xx - x1) ** 2 + (yy - y1) ** 2 <= r ** 2
+        t = np.clip(((xx - x1) * dx + (yy - y1) * dy) / L2, 0.0, 1.0)
+        px = x1 + t * dx
+        py = y1 + t * dy
+        return ((xx - px) ** 2 + (yy - py) ** 2) <= r ** 2
+
     carved_doors = np.zeros_like(m)
-    for _ in range(12):
+    for _ in range(35):
         lab_w, n_w = ndi.label(walk)
-        if n_w <= 1: break
+        if n_w <= 1:
+            break
         sizes = ndi.sum(walk, lab_w, range(1, n_w + 1))
         main_c = (lab_w == (sizes.argmax() + 1))
         dist_m, near_m = ndi.distance_transform_edt(~main_c, return_indices=True)
         
         opened = 0
         for k in range(1, n_w + 1):
-            if k == sizes.argmax() + 1: continue
-            if sizes[k - 1] < 15: continue
+            if k == sizes.argmax() + 1:
+                continue
+            if sizes[k - 1] < 10:
+                continue
             other_c = (lab_w == k)
             sub_d = np.where(other_c, dist_m, 999.0)
             ymin, xmin = np.unravel_index(sub_d.argmin(), sub_d.shape)
             d = sub_d[ymin, xmin]
-            if d <= 8.5:
+            if d <= 22.0:
                 cy, cx = near_m[0, ymin, xmin], near_m[1, ymin, xmin]
-                mid_y = (ymin + cy) / 2.0
-                mid_x = (xmin + cx) / 2.0
-                disk = (xx - mid_x)**2 + (yy - mid_y)**2 <= 2.2**2
-                disk &= footprint
-                carved_doors |= disk
-                walk |= disk
+                capsule = carve_capsule((ymin, xmin), (cy, cx), r=2.2)
+                capsule &= footprint
+                carved_doors |= capsule
+                walk |= capsule
                 opened += 1
-        if opened == 0: break
+        if opened == 0:
+            break
+
+    # Keep only the fully connected main component (drop tiny inaccessible specks)
+    lab_w, n_w = ndi.label(walk)
+    sizes = ndi.sum(walk, lab_w, range(1, n_w + 1))
+    walk = (lab_w == (sizes.argmax() + 1))
         
     clr = ndi.distance_transform_cdt(walk, metric='chessboard')
     
@@ -219,7 +236,9 @@ def build_floor_clean(floor, page):
     wall_px = np.pad(wall_px, ((0, H - wall_px.shape[0]), (0, W - wall_px.shape[1])))
     wall_px = ndi.binary_closing(wall_px, structure=np.ones((5, 5), bool)) | wall_px
     # Erase carved doorways and bridge from visual wall image
-    wall_px &= ~np.kron(carved_doors | bridge, np.ones((CELL, CELL), bool))
+    door_mask_px = np.kron(carved_doors | bridge, np.ones((CELL, CELL), bool))
+    door_mask_px = ndi.binary_dilation(door_mask_px, structure=np.ones((3, 3), bool))
+    wall_px &= ~door_mask_px
     
     # Room segmentation mask
     w_rooms = ndi.binary_closing(m, structure=np.ones((7, 7)))
@@ -317,10 +336,21 @@ def build_floor_clean(floor, page):
     for k in range(1, n_corr + 1):
         mk_c = (lab_corr == k)
         if mk_c.sum() > 40:
-            cy_c, cx_c = ndi.center_of_mass(mk_c)
-            c_name = 'Бастауыш блогы дәлізі' if cx_c < 185 else ('Оң қанат дәлізі' if cx_c > 400 else 'Орталық дәліз')
+            dist_c = ndi.distance_transform_edt(mk_c)
+            yy_c, xx_c = np.unravel_index(dist_c.argmax(), dist_c.shape)
+            c_name = 'Бастауыш блогы дәлізі' if xx_c < 185 else ('Оң қанат дәлізі' if xx_c > 400 else 'Орталық дәліз')
             z = add_zone(c_name, 'corridor', f'{c_name}ндесіз', mk_c)
-            z['cx'], z['cy'] = int(cx_c), int(cy_c)
+            z['cx'], z['cy'] = int(xx_c), int(yy_c)
+            
+    # Seamlessly assign ANY remaining unassigned walkable cells (doors, corners, neckings)
+    # to their adjacent zone, so NO walkable cell has zid == 0 (zero walls in doorways)
+    unassigned = (zid == 0) & walk
+    if unassigned.any():
+        assigned = (zid > 0)
+        dist_to_assigned, nearest_coords = ndi.distance_transform_edt(~assigned, return_indices=True)
+        ny = nearest_coords[0][unassigned]
+        nx = nearest_coords[1][unassigned]
+        zid[unassigned] = zid[ny, nx]
             
     # Visual map coloring
     tmap = {z['id']: COL.get(z['type'], COL['room']) for z in zones}
