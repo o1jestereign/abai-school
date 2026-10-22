@@ -342,7 +342,7 @@
     const curPath = window.location.pathname.replace(/\/[^/]*$/, '/');
     let defaultBase = curOrigin.startsWith('http') && !curOrigin.includes('localhost')
       ? (curOrigin + curPath) 
-      : 'https://o1jestereign.github.io/abai-school/';
+      : 'https://abai-school.vercel.app/';
     if (!defaultBase.endsWith('/')) defaultBase += '/';
 
     const inputUrl = document.getElementById('base-url');
