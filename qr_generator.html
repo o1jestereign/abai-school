@@ -144,22 +144,139 @@
       font-size: 12px;
       opacity: 0.85;
     }
+    .qr-frame-wrap {
+      position: relative;
+      margin: 20px 0 14px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+    }
     .qr-box {
-      margin: 22px 0 14px;
       padding: 12px;
-      background: #f8fafc;
-      border: 2px dashed #cbd5e1;
+      background: #ffffff;
       border-radius: 16px;
       display: flex;
       justify-content: center;
       align-items: center;
       min-height: 200px;
       min-width: 200px;
+      position: relative;
+      z-index: 2;
     }
     .qr-box canvas, .qr-box img {
       display: block;
       width: 190px !important;
       height: 190px !important;
+    }
+
+    /* THEMATIC FRAMES */
+    /* 1. Open Book Theme (Library) */
+    .theme-book {
+      background: #fffdf7;
+      border: 3px solid #b45309;
+      border-radius: 8px 18px 18px 8px;
+      box-shadow: -8px 8px 0 #92400e, 0 12px 28px rgba(180,83,9,0.2);
+      padding: 18px 24px;
+    }
+    .book-ribbon {
+      position: absolute;
+      top: -12px;
+      right: 28px;
+      width: 22px;
+      height: 48px;
+      background: #dc2626;
+      clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 80%, 0 100%);
+      z-index: 5;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    }
+    .book-spine-decor {
+      position: absolute;
+      left: 10px;
+      top: 10px;
+      bottom: 10px;
+      width: 6px;
+      border-right: 2px solid #cbd5e1;
+    }
+
+    /* 2. Dinner Plate Theme (Cafe) */
+    .theme-plate {
+      border-radius: 50%;
+      border: 6px solid #d97706;
+      background: #fffcf7;
+      padding: 24px;
+      box-shadow: 0 10px 30px rgba(217,119,6,0.25), inset 0 0 15px rgba(245,158,11,0.15);
+    }
+    .cutlery-left, .cutlery-right {
+      position: absolute;
+      font-size: 32px;
+      top: 50%;
+      transform: translateY(-50%);
+      opacity: 0.85;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));
+    }
+    .cutlery-left { left: 16px; }
+    .cutlery-right { right: 16px; }
+
+    /* 3. Classical Portal Theme (Entrance) */
+    .theme-portal {
+      border: 4px solid #0891b2;
+      border-radius: 20px 20px 8px 8px;
+      background: #f0fdfa;
+      box-shadow: 0 10px 25px rgba(8,145,178,0.2);
+    }
+    .portal-arch {
+      position: absolute;
+      top: -16px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #0891b2;
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 3px 14px;
+      border-radius: 999px;
+      letter-spacing: 0.05em;
+      white-space: nowrap;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+
+    /* 4. Theater Stage Theme (Assembly Hall) */
+    .theme-stage {
+      border: 4px solid #7c3aed;
+      border-radius: 16px;
+      background: #faf5ff;
+      box-shadow: 0 10px 30px rgba(124,58,237,0.25);
+    }
+    .curtain-drape {
+      position: absolute;
+      top: -10px;
+      left: 10px;
+      right: 10px;
+      height: 14px;
+      background: repeating-linear-gradient(90deg, #9333ea, #9333ea 12px, #7e22ce 12px, #7e22ce 24px);
+      border-radius: 8px 8px 0 0;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    /* 5. Sports Court Shield (Gym) */
+    .theme-court {
+      border: 4px solid #059669;
+      border-radius: 24px;
+      background: #f0fdf4;
+      box-shadow: 0 10px 25px rgba(5,150,105,0.25);
+    }
+    .court-badge {
+      position: absolute;
+      top: -14px;
+      right: 16px;
+      background: #059669;
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 3px 12px;
+      border-radius: 999px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
     }
     .card-instructions {
       text-align: center;
@@ -359,6 +476,47 @@
       SPOTS.forEach(s => {
         const fullUrl = `${base}?spot=${s.id}`;
         
+        let frameHtml = '';
+        let hdFile = '';
+        if (s.id === 'library') {
+          hdFile = '5_Кітапхана.png';
+          frameHtml = `
+            <div class="qr-frame-wrap">
+              <div class="book-ribbon"></div>
+              <div class="book-spine-decor"></div>
+              <div class="qr-box theme-book" id="qr-${s.id}"></div>
+            </div>`;
+        } else if (s.id === 'cafe') {
+          hdFile = '2_Асхана.png';
+          frameHtml = `
+            <div class="qr-frame-wrap">
+              <div class="cutlery-left">🍴</div>
+              <div class="qr-box theme-plate" id="qr-${s.id}"></div>
+              <div class="cutlery-right">🥄</div>
+            </div>`;
+        } else if (s.id === 'entrance') {
+          hdFile = '1_Басты_кіреберіс.png';
+          frameHtml = `
+            <div class="qr-frame-wrap">
+              <div class="portal-arch">🏛️ ҚОШ КЕЛДІҢІЗДЕР!</div>
+              <div class="qr-box theme-portal" id="qr-${s.id}"></div>
+            </div>`;
+        } else if (s.id === 'assembly') {
+          hdFile = '3_Актовый_зал.png';
+          frameHtml = `
+            <div class="qr-frame-wrap">
+              <div class="curtain-drape"></div>
+              <div class="qr-box theme-stage" id="qr-${s.id}"></div>
+            </div>`;
+        } else if (s.id === 'gym') {
+          hdFile = '4_Спорт_залы.png';
+          frameHtml = `
+            <div class="qr-frame-wrap">
+              <div class="court-badge">🏆 SPORT ARENA</div>
+              <div class="qr-box theme-court" id="qr-${s.id}"></div>
+            </div>`;
+        }
+
         const card = document.createElement('div');
         card.className = 'poster-card';
 
@@ -368,15 +526,16 @@
             <div class="card-title">${s.icon} ${s.title}</div>
             <div class="card-sub">${s.sub}</div>
           </div>
-          <div class="qr-box" id="qr-${s.id}"></div>
+          ${frameHtml}
           <div class="card-instructions">
             <div class="inst-main">📷 Телефон камерасымен сканерлеңіз</div>
             <div class="inst-sub">Мектеп картасы осы орыннан бастап бірден ашылады</div>
           </div>
           <div class="card-url" title="${fullUrl}">${fullUrl}</div>
-          <div class="card-actions">
+          <div class="card-actions" style="flex-wrap: wrap; justify-content: center;">
             <a href="${fullUrl}" target="_blank" class="act-btn">🔗 Тексеру</a>
-            <button class="act-btn" onclick="downloadQR('${s.id}', '${s.title}')">💾 PNG сақтау</button>
+            <button class="act-btn" onclick="downloadQR('${s.id}', '${s.title}')">💾 QR сақтау</button>
+            <a href="qr_codes/${hdFile}" download="${hdFile}" class="act-btn" style="background:#0284c7; color:#fff; border-color:#0284c7;">🎨 Дайын HD Постер</a>
           </div>
         `;
 

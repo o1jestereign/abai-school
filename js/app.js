@@ -336,12 +336,38 @@ function searchList(q) {
   return [...extra, ...out].slice(0, 40);
 }
 let sActive = -1, sCur = [];
+let isTouchScrolling = false, touchStartY = 0, touchStartX = 0;
+
+sRes.addEventListener('touchstart', (ev) => {
+  if (ev.touches.length > 0) {
+    touchStartX = ev.touches[0].clientX;
+    touchStartY = ev.touches[0].clientY;
+    isTouchScrolling = false;
+  }
+}, { passive: true });
+
+sRes.addEventListener('touchmove', (ev) => {
+  if (ev.touches.length > 0) {
+    const dx = Math.abs(ev.touches[0].clientX - touchStartX);
+    const dy = Math.abs(ev.touches[0].clientY - touchStartY);
+    if (dy > 6 || dx > 6) isTouchScrolling = true;
+  }
+}, { passive: true });
+
 function renderResults() {
   sCur = searchList(sInput.value); sActive = -1; sRes.innerHTML = '';
   if (!sCur.length) sRes.innerHTML = '<li class="empty">Ештеңе табылмады</li>';
-  sCur.forEach((e, i) => { const li = document.createElement('li');
+  sCur.forEach((e) => {
+    const li = document.createElement('li');
     li.innerHTML = `<span class="r-ico">${e.icon}</span><span class="r-name">${e.name}</span>` + (e.floor ? `<span class="r-floor ${e.floor === S.floor ? 'here' : ''}">${e.floor}-қабат</span>` : '<span class="r-floor here">жақын</span>');
-    li.onmousedown = (ev) => { ev.preventDefault(); pick(e); }; li.ontouchend = (ev) => { ev.preventDefault(); pick(e); }; sRes.appendChild(li); });
+    li.addEventListener('click', (ev) => { ev.preventDefault(); pick(e); });
+    li.addEventListener('touchend', (ev) => {
+      if (isTouchScrolling) return; // Do not select if user was scrolling!
+      ev.preventDefault();
+      pick(e);
+    });
+    sRes.appendChild(li);
+  });
   sRes.classList.remove('hidden');
 }
 function nearestOfType(type) {
@@ -362,7 +388,15 @@ sInput.addEventListener('keydown', (ev) => {
   else if (ev.key === 'Enter') { const e = sCur[Math.max(0, sActive)]; if (e) pick(e); }
   ev.stopPropagation();
 });
-sInput.addEventListener('blur', () => setTimeout(() => sRes.classList.add('hidden'), 150));
+
+// Dismiss search only when tapping outside of search box
+document.addEventListener('pointerdown', (ev) => {
+  const box = $('search-box');
+  if (box && !box.contains(ev.target)) {
+    sRes.classList.add('hidden');
+  }
+});
+
 $('search-clear').onclick = () => { sInput.value = ''; $('search-clear').classList.add('hidden'); clearRoute(); sInput.focus(); };
 $('route-cancel').onclick = () => { sInput.value = ''; $('search-clear').classList.add('hidden'); clearRoute(); };
 
