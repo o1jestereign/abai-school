@@ -100,9 +100,9 @@ h1,h2{margin:0;font-family:'Outfit','Segoe UI',system-ui,sans-serif}
 @keyframes pop2{from{opacity:0;transform:scale(.94)}}
 .modal-head{display:flex;justify-content:space-between;align-items:center}
 .modal-head h1{font-size:20px}
-.qr-reader{width:100%;border-radius:16px;overflow:hidden;background:#050a16;min-height:0}
-.qr-reader:empty{display:none}
-.qr-status{font-size:13px;color:var(--muted)}
+.qr-reader{width:100%;min-height:260px;max-height:360px;border-radius:18px;overflow:hidden;background:#050a16;border:1px solid rgba(56,189,248,.3);position:relative;display:flex;align-items:center;justify-content:center}
+.qr-reader video{width:100%!important;height:100%!important;object-fit:cover!important;border-radius:16px;display:block!important}
+.qr-status{font-size:13px;color:var(--muted);text-align:center}
 .primary-btn{border:none;cursor:pointer;color:#04121a;font-weight:700;font-family:'Outfit',sans-serif;padding:12px;border-radius:14px;background:linear-gradient(135deg,var(--cyan),var(--blue));font-size:14px}
 .sim-title{font-size:15px;margin-top:6px;color:#fde68a}
 .sim-list{display:grid;grid-template-columns:1fr 1fr;gap:8px}

@@ -425,34 +425,207 @@ const PRESETS = [
 ];
 PRESETS.forEach(([label, f, name]) => { const b = document.createElement('button'); b.textContent = '📍 ' + label;
   b.onclick = () => { const z = findZone(f, name); if (z) { teleport(f, z.cx, z.cy, label); closeQR(); } }; $('sim-list').appendChild(b); });
-function handleQR(text) {
-  let obj = null; try { obj = JSON.parse(text); } catch (e) { /* plain id */ }
-  let floor = null, z = null;
-  if (obj && typeof obj === 'object') {
-    floor = Number(obj.floor) || S.floor;
-    if (obj.room) z = findZone(floor, String(obj.room));
-    if (z) teleport(floor, z.cx, z.cy, `${obj.room} (${floor}-қабат)`);
-    else if (obj.x != null && obj.y != null) teleport(floor, Number(obj.x), Number(obj.y), `${floor}-қабат · QR орны`);
-    else return false; return true;
+function handleSpotName(spot) {
+  if (!spot) return false;
+  const ALIASES = {
+    'entrance': { floor: 1, name: 'Орталық вестибюль / Гардероб', label: 'Басты кіреберіс' },
+    'kireberis': { floor: 1, name: 'Орталық вестибюль / Гардероб', label: 'Басты кіреберіс' },
+    'vestibule': { floor: 1, name: 'Орталық вестибюль / Гардероб', label: 'Орталық вестибюль' },
+    'cafe': { floor: 1, name: 'Асхана', label: 'Мектеп асханасы' },
+    'canteen': { floor: 1, name: 'Асхана', label: 'Мектеп асханасы' },
+    'asxana': { floor: 1, name: 'Асхана', label: 'Мектеп асханасы' },
+    'ashana': { floor: 1, name: 'Асхана', label: 'Мектеп асханасы' },
+    'assembly': { floor: 1, name: 'Актовый зал', label: 'Актовый зал' },
+    'aktovyi': { floor: 1, name: 'Актовый зал', label: 'Актовый зал' },
+    'akt': { floor: 1, name: 'Актовый зал', label: 'Актовый зал' },
+    'gym': { floor: 2, name: 'Спорт залы (Үлкен зал)', label: 'Спорт залы' },
+    'sport': { floor: 2, name: 'Спорт залы (Үлкен зал)', label: 'Спорт залы' },
+    'sportzal': { floor: 2, name: 'Спорт залы (Үлкен зал)', label: 'Спорт залы' },
+    'library': { floor: 3, name: 'Кітапхана және оқу залы', label: 'Кітапхана' },
+    'kitapxana': { floor: 3, name: 'Кітапхана және оқу залы', label: 'Кітапхана' }
+  };
+
+  const key = String(spot).toLowerCase().trim();
+  if (ALIASES[key]) {
+    const a = ALIASES[key];
+    const z = findZone(a.floor, a.name);
+    if (z) {
+      teleport(a.floor, z.cx, z.cy, `${a.label} (${a.floor}-қабат)`);
+      return true;
+    }
   }
-  for (let f = 1; f <= 3 && !z; f++) { z = findZone(f, text.trim()); if (z) floor = f; }
-  if (z) { teleport(floor, z.cx, z.cy, `${z.name} (${floor}-қабат)`); return true; }
+
+  // Search by zone name or room number
+  for (let f = 1; f <= 3; f++) {
+    const z = findZone(f, spot);
+    if (z) {
+      teleport(f, z.cx, z.cy, `${z.name} (${f}-қабат)`);
+      return true;
+    }
+  }
   return false;
 }
-let qr = null;
-function closeQR() { $('qr-modal').classList.add('hidden'); if (qr) { qr.stop().catch(() => {}).finally(() => { try { qr.clear(); } catch (e) {} qr = null; }); } }
-$('qr-btn').onclick = () => { $('qr-modal').classList.remove('hidden'); $('qr-status').textContent = 'Камераны іске қосу үшін батырманы басыңыз'; };
+
+function handleQR(text) {
+  if (!text) return false;
+  text = String(text).trim();
+
+  // 1. If scanned text is a full URL (e.g. https://abai-school.vercel.app/?spot=cafe)
+  if (text.includes('?') || text.includes('#') || text.startsWith('http')) {
+    try {
+      const url = new URL(text, window.location.origin);
+      const spot = url.searchParams.get('spot') || url.searchParams.get('start') || url.searchParams.get('room') || url.searchParams.get('qr') || url.hash.replace('#', '');
+      const to = url.searchParams.get('to') || url.searchParams.get('target');
+      if (spot && handleSpotName(spot)) {
+        if (to) {
+          setTimeout(() => {
+            for (let f = 1; f <= 3; f++) {
+              const dest = findZone(f, to);
+              if (dest) { setTarget(f, dest); break; }
+            }
+          }, 600);
+        }
+        return true;
+      }
+    } catch (e) {
+      const m = text.match(/[?&](?:spot|start|room)=([^&#]+)/);
+      if (m && handleSpotName(decodeURIComponent(m[1]))) return true;
+    }
+  }
+
+  // 2. If it is JSON
+  let obj = null;
+  try { obj = JSON.parse(text); } catch (e) {}
+  if (obj && typeof obj === 'object') {
+    const floor = Number(obj.floor) || S.floor;
+    if (obj.room) {
+      const z = findZone(floor, String(obj.room));
+      if (z) { teleport(floor, z.cx, z.cy, `${obj.room} (${floor}-қабат)`); return true; }
+    } else if (obj.x != null && obj.y != null) {
+      teleport(floor, Number(obj.x), Number(obj.y), `${floor}-қабат · QR орны`);
+      return true;
+    }
+  }
+
+  // 3. Fallback: plain spot name or classroom number
+  return handleSpotName(text);
+}
+
+let qrScanner = null;
+let isScanning = false;
+
+async function stopCamera() {
+  if (qrScanner && isScanning) {
+    try {
+      await qrScanner.stop();
+    } catch (e) {}
+  }
+  isScanning = false;
+  const btn = $('qr-start');
+  if (btn) {
+    btn.textContent = 'Камераны қосу';
+    btn.style.background = '';
+    btn.style.color = '';
+    btn.disabled = false;
+  }
+}
+
+async function closeQR() {
+  await stopCamera();
+  $('qr-modal').classList.add('hidden');
+}
+
+$('qr-btn').onclick = () => {
+  $('qr-modal').classList.remove('hidden');
+  $('qr-status').textContent = 'Камераны іске қосу үшін батырманы басыңыз';
+};
 $('qr-close').onclick = closeQR;
-$('qr-modal').addEventListener('pointerdown', (e) => { if (e.target.id === 'qr-modal') closeQR(); });
+$('qr-modal').addEventListener('pointerdown', (e) => {
+  if (e.target.id === 'qr-modal') closeQR();
+});
+
 $('qr-start').onclick = async () => {
-  if (!window.Html5Qrcode) { $('qr-status').textContent = 'Сканер кітапханасы жүктелмеді (интернет қажет). Төмендегі симуляцияны қолданыңыз.'; return; }
+  const statusEl = $('qr-status');
+  const btnStart = $('qr-start');
+
+  if (isScanning) {
+    await stopCamera();
+    statusEl.textContent = 'Камера тоқтатылды';
+    return;
+  }
+
+  if (!window.Html5Qrcode) {
+    statusEl.textContent = '⚠️ Сканер кітапханасы табылмады. Төмендегі жылдам тест нүктелерін басыңыз.';
+    return;
+  }
+
+  statusEl.textContent = '⏳ Камера қосылуда, рұқсат беріңіз…';
+  btnStart.textContent = 'Қосылуда…';
+  btnStart.disabled = true;
+
   try {
-    qr = new Html5Qrcode('qr-reader');
-    await qr.start({ facingMode: 'environment' }, { fps: 10, qrbox: { width: 230, height: 230 } }, (txt) => {
-      if (handleQR(txt)) closeQR(); else $('qr-status').textContent = 'QR танылмады: ' + txt.slice(0, 60);
-    });
-    $('qr-status').textContent = 'QR кодты камераға көрсетіңіз…';
-  } catch (err) { $('qr-status').textContent = 'Камераға қол жеткізу мүмкін емес. Симуляцияны қолданыңыз.'; qr = null; }
+    if (!qrScanner) {
+      qrScanner = new Html5Qrcode('qr-reader');
+    }
+
+    const config = {
+      fps: 15,
+      qrbox: (viewfinderWidth, viewfinderHeight) => {
+        const edge = Math.min(viewfinderWidth, viewfinderHeight);
+        const size = Math.floor(edge * 0.75);
+        return { width: Math.max(160, Math.min(size, 260)), height: Math.max(160, Math.min(size, 260)) };
+      },
+      aspectRatio: 1.0
+    };
+
+    const onScanSuccess = (decodedText) => {
+      if (navigator.vibrate) try { navigator.vibrate(80); } catch (e) {}
+      if (handleQR(decodedText)) {
+        closeQR();
+      } else {
+        statusEl.innerHTML = `⚠️ Белгісіз QR: <span style="font-size:11px">${decodedText.slice(0, 45)}</span>`;
+      }
+    };
+
+    // Camera selection strategy: environment (back camera) with progressive fallbacks
+    try {
+      await qrScanner.start({ facingMode: { exact: "environment" } }, config, onScanSuccess, () => {});
+    } catch (e1) {
+      try {
+        await qrScanner.start({ facingMode: "environment" }, config, onScanSuccess, () => {});
+      } catch (e2) {
+        try {
+          const cameras = await Html5Qrcode.getCameras();
+          if (cameras && cameras.length > 0) {
+            // Pick last camera (usually back/environment camera on phones)
+            const camId = cameras[cameras.length - 1].id;
+            await qrScanner.start(camId, config, onScanSuccess, () => {});
+          } else {
+            await qrScanner.start({}, config, onScanSuccess, () => {});
+          }
+        } catch (e3) {
+          // Final fallback to user facing camera
+          await qrScanner.start({ facingMode: "user" }, config, onScanSuccess, () => {});
+        }
+      }
+    }
+
+    isScanning = true;
+    statusEl.innerHTML = '🟢 Камера қосылды! QR-кодты шаршыға көрсетіңіз';
+    btnStart.textContent = '⏹ Камераны өшіру';
+    btnStart.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)';
+    btnStart.style.color = '#fff';
+    btnStart.disabled = false;
+
+  } catch (err) {
+    console.error('Camera error:', err);
+    statusEl.innerHTML = `⚠️ Камера ашылмады (${err.message || 'Рұқсат берілмеді'}). Төмендегі тест нүктелерін басыңыз.`;
+    btnStart.textContent = 'Қайта қосып көру';
+    btnStart.style.background = '';
+    btnStart.style.color = '';
+    btnStart.disabled = false;
+    isScanning = false;
+  }
 };
 
 /* ============ INPUT: JOYSTICK, KEYS, CAMERA ============ */
