@@ -65,10 +65,10 @@ def draw_open_book_poster(qr_img, target_url):
     
     d.text((W // 2, 45), "АБАЙ АТЫНДАҒЫ ДАРЫНДЫ БАЛАЛАРҒА АРНАЛҒАН МЕКТЕП", fill=(255, 255, 255), font=F_HEADER, anchor="mm")
     d.text((W // 2, 90), "2D ІШКІ НАВИГАЦИЯ ЖҮЙЕСІ · DIGITAL TWIN", fill=(186, 230, 253), font=F_SUBHEAD, anchor="mm")
-    d.text((W // 2, 125), "3-ҚАБАТ · КІТАПХАНА ЖӘНЕ ОҚУ КОБОРКИНГІ", fill=(254, 240, 138), font=F_BADGE, anchor="mm")
+    d.text((W // 2, 125), "1-ҚАБАТ · 3 КІТАПХАНА ЖӘНЕ ОҚУ ЗАЛЫ", fill=(254, 240, 138), font=F_BADGE, anchor="mm")
     
     # Title Section
-    d.text((W // 2, 220), "📖 КІТАПХАНА ЖӘНЕ ОҚУ ЗАЛЫ", fill=(15, 76, 129), font=F_TITLE, anchor="mm")
+    d.text((W // 2, 220), "📖 3 КІТАПХАНА ЖӘНЕ ОҚУ ЗАЛЫ", fill=(15, 76, 129), font=F_TITLE, anchor="mm")
     d.text((W // 2, 265), "«Кітап — білім бұлағы» · Ғылым мен өнер орталығы", fill=(100, 116, 139), font=F_SUBHEAD, anchor="mm")
 
     # ================= DRAW OPEN BOOK =================
@@ -110,7 +110,7 @@ def draw_open_book_poster(qr_img, target_url):
     
     # Instructions Section
     d.text((W // 2, 1050), "📷 Телефон камерасымен осы QR-кодты сканерлеңіз", fill=(15, 23, 42), font=F_INST_MAIN, anchor="mm")
-    d.text((W // 2, 1090), "Мектеп картасы бірден 3-қабаттағы Кітапханадан бастап ашылады", fill=(71, 85, 105), font=F_INST_SUB, anchor="mm")
+    d.text((W // 2, 1090), "Мектеп картасы бірден 1-қабаттағы Кітапханадан бастап ашылады", fill=(71, 85, 105), font=F_INST_SUB, anchor="mm")
     d.text((W // 2, 1125), "Кез келген сыныпқа немесе залға маршрут сызып береді", fill=(100, 116, 139), font=F_INST_SUB, anchor="mm")
     
     # Footer link bar
@@ -131,10 +131,10 @@ def draw_cafe_poster(qr_img, target_url):
     
     d.text((W // 2, 45), "АБАЙ АТЫНДАҒЫ ДАРЫНДЫ БАЛАЛАРҒА АРНАЛҒАН МЕКТЕП", fill=(255, 255, 255), font=F_HEADER, anchor="mm")
     d.text((W // 2, 90), "2D ІШКІ НАВИГАЦИЯ ЖҮЙЕСІ · DIGITAL TWIN", fill=(254, 243, 199), font=F_SUBHEAD, anchor="mm")
-    d.text((W // 2, 125), "1-ҚАБАТ · БАТЫС ҚАНАТ · МЕКТЕП АСХАНАСЫ", fill=(254, 252, 232), font=F_BADGE, anchor="mm")
+    d.text((W // 2, 125), "1-ҚАБАТ · 2 АСХАНА · МЕКТЕП АСХАНАСЫ", fill=(254, 252, 232), font=F_BADGE, anchor="mm")
     
     # Title
-    d.text((W // 2, 220), "🍽️ МЕКТЕП АСХАНАСЫ", fill=(180, 83, 9), font=F_TITLE, anchor="mm")
+    d.text((W // 2, 220), "🍽️ 2 АСХАНА (МЕКТЕП АСХАНАСЫ)", fill=(180, 83, 9), font=F_TITLE, anchor="mm")
     d.text((W // 2, 265), "«Ас — адамның арқауы» · Тәтті әрі құнарлы ас болсын!", fill=(146, 64, 14), font=F_SUBHEAD, anchor="mm")
 
     # ================= DRAW DINNER PLATE =================
@@ -195,10 +195,10 @@ def draw_entrance_poster(qr_img, target_url):
     
     d.text((W // 2, 45), "АБАЙ АТЫНДАҒЫ ДАРЫНДЫ БАЛАЛАРҒА АРНАЛҒАН МЕКТЕП", fill=(255, 255, 255), font=F_HEADER, anchor="mm")
     d.text((W // 2, 90), "2D ІШКІ НАВИГАЦИЯ ЖҮЙЕСІ · DIGITAL TWIN", fill=(207, 250, 254), font=F_SUBHEAD, anchor="mm")
-    d.text((W // 2, 125), "1-ҚАБАТ · ОРТАЛЫҚ ВЕСТИБЮЛЬ · БАСТЫ КІРЕБЕРІС", fill=(254, 240, 138), font=F_BADGE, anchor="mm")
+    d.text((W // 2, 125), "1-ҚАБАТ · 7 СІЗ ОСЫНДАСЫЗ · БАСТЫ КІРЕБЕРІС", fill=(254, 240, 138), font=F_BADGE, anchor="mm")
     
     # Title
-    d.text((W // 2, 220), "🏛️ ҚОШ КЕЛДІҢІЗДЕР! · БАСТЫ КІРЕБЕРІС", fill=(14, 116, 144), font=F_TITLE, anchor="mm")
+    d.text((W // 2, 220), "📍 7 СІЗ ОСЫНДАСЫЗ · БАСТЫ КІРЕБЕРІС", fill=(14, 116, 144), font=F_TITLE, anchor="mm")
     d.text((W // 2, 265), "Мектептің бас ғимаратына қош келдіңіз · 1-қабат Вестибюль", fill=(71, 85, 105), font=F_SUBHEAD, anchor="mm")
 
     # ================= DRAW ARCHITECTURAL PORTAL =================
@@ -212,7 +212,7 @@ def draw_entrance_poster(qr_img, target_url):
     
     # Welcome banner on pediment
     d.rounded_rectangle([(W // 2 - 160, top_y + 10), (W // 2 + 160, top_y + 55)], radius=10, fill=(255, 255, 255))
-    d.text((W // 2, top_y + 32), "✨ ОРТАЛЫҚ ВЕСТИБЮЛЬ ✨", fill=(14, 116, 144), font=F_BADGE, anchor="mm")
+    d.text((W // 2, top_y + 32), "✨ 7 СІЗ ОСЫНДАСЫЗ ✨", fill=(14, 116, 144), font=F_BADGE, anchor="mm")
     
     # Left pillar
     d.rectangle([(ax1, top_y + 60), (ax1 + 50, bot_y)], fill=(207, 250, 254), outline=(14, 116, 144), width=3)
@@ -265,10 +265,10 @@ def draw_assembly_poster(qr_img, target_url):
     
     d.text((W // 2, 45), "АБАЙ АТЫНДАҒЫ ДАРЫНДЫ БАЛАЛАРҒА АРНАЛҒАН МЕКТЕП", fill=(255, 255, 255), font=F_HEADER, anchor="mm")
     d.text((W // 2, 90), "2D ІШКІ НАВИГАЦИЯ ЖҮЙЕСІ · DIGITAL TWIN", fill=(243, 232, 255), font=F_SUBHEAD, anchor="mm")
-    d.text((W // 2, 125), "1-ҚАБАТ · СОЛТҮСТІК БЛОК · АКТОВЫЙ ЗАЛ", fill=(254, 240, 138), font=F_BADGE, anchor="mm")
+    d.text((W // 2, 125), "1-ҚАБАТ · 4 АКТ ЗАЛЫ · МӘЖІЛІС ЗАЛЫ", fill=(254, 240, 138), font=F_BADGE, anchor="mm")
     
     # Title
-    d.text((W // 2, 220), "🎭 АКТОВЫЙ ЗАЛ (МӘЖІЛІС ЗАЛЫ)", fill=(88, 28, 135), font=F_TITLE, anchor="mm")
+    d.text((W // 2, 220), "🎭 4 АКТ ЗАЛЫ", fill=(88, 28, 135), font=F_TITLE, anchor="mm")
     d.text((W // 2, 265), "Мәдениет, өнер және салтанатты іс-шаралар орталығы", fill=(107, 33, 168), font=F_SUBHEAD, anchor="mm")
 
     # ================= DRAW THEATER CURTAINS & STAGE =================
@@ -328,10 +328,10 @@ def draw_gym_poster(qr_img, target_url):
     
     d.text((W // 2, 45), "АБАЙ АТЫНДАҒЫ ДАРЫНДЫ БАЛАЛАРҒА АРНАЛҒАН МЕКТЕП", fill=(255, 255, 255), font=F_HEADER, anchor="mm")
     d.text((W // 2, 90), "2D ІШКІ НАВИГАЦИЯ ЖҮЙЕСІ · DIGITAL TWIN", fill=(209, 250, 229), font=F_SUBHEAD, anchor="mm")
-    d.text((W // 2, 125), "2-ҚАБАТ · ҮЛКЕН СПОРТ КЕШЕНІ · СПОРТ ЗАЛЫ", fill=(254, 240, 138), font=F_BADGE, anchor="mm")
+    d.text((W // 2, 125), "1-ҚАБАТ · 1 СПОРТЗАЛ · БАТЫС-СОЛТҮСТІК ҚАНАТ", fill=(254, 240, 138), font=F_BADGE, anchor="mm")
     
     # Title
-    d.text((W // 2, 220), "🏀 СПОРТ ЗАЛЫ (ҮЛКЕН КЕШЕН)", fill=(4, 120, 87), font=F_TITLE, anchor="mm")
+    d.text((W // 2, 220), "⚽ 1 СПОРТЗАЛ", fill=(4, 120, 87), font=F_TITLE, anchor="mm")
     d.text((W // 2, 265), "«Дені саудың — жаны сау» · Салауатты өмір салты", fill=(6, 95, 70), font=F_SUBHEAD, anchor="mm")
 
     # ================= DRAW SPORTS SHIELD / COURT =================
@@ -359,8 +359,8 @@ def draw_gym_poster(qr_img, target_url):
 
     # Instructions
     d.text((W // 2, 1050), "📷 Телефон камерасымен осы QR-кодты сканерлеңіз", fill=(15, 23, 42), font=F_INST_MAIN, anchor="mm")
-    d.text((W // 2, 1090), "Мектеп картасы автоматты түрде 2-ҚАБАТТАҒЫ Спорт залдан ашылады", fill=(71, 85, 105), font=F_INST_SUB, anchor="mm")
-    d.text((W // 2, 1125), "Спорт залдан кез келген кабинетке дейінгі маршрутты көріңіз", fill=(100, 116, 139), font=F_INST_SUB, anchor="mm")
+    d.text((W // 2, 1090), "Мектеп картасы автоматты түрде 1-ҚАБАТТАҒЫ Спортзалдан ашылады", fill=(71, 85, 105), font=F_INST_SUB, anchor="mm")
+    d.text((W // 2, 1125), "Спортзалдан кез келген кабинетке дейінгі маршрутты көріңіз", fill=(100, 116, 139), font=F_INST_SUB, anchor="mm")
     
     # Footer link bar
     d.rounded_rectangle([(80, 1180), (W - 80, 1250)], radius=12, fill=(209, 250, 229), outline=(110, 231, 183))

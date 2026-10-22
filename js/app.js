@@ -17,7 +17,7 @@ const floors = D.floors.map((f) => {
   o.fields = new Map();
   return o;
 });
-const ZICON = { restroom: '🚻', stairs: '🪜', assembly: '🎭', cafe: '🍽️', exit: '🚪', library: '📚', gym: '🏀' };
+const ZICON = { restroom: '🚻', stairs: '🪜', assembly: '🎭', cafe: '🍽️', exit: '🚪', library: '📚', gym: '⚽', med: '➕' };
 
 function clearance(grid, w, h) { // chessboard distance to nearest wall
   const d = new Uint8Array(w * h);
@@ -318,7 +318,7 @@ const norm = (s) => s.toLowerCase().replace(/ё/g, 'е').replace(/[ә]/g, 'а').
 const ENTRIES = [];
 floors.forEach((fl) => fl.zones.forEach((z) => {
   if (z.type === 'stairs') return;
-  ENTRIES.push({ floor: fl.floor, zone: z, name: z.name, key: norm(z.name + ' ' + (z.type === 'restroom' ? 'дәретхана туалет wc' : z.type === 'cafe' ? 'столовая асхана' : z.type === 'room' ? 'кабинет сынып' : '')), icon: ZICON[z.type] || (z.type === 'room' ? '🚪' : z.type === 'corridor' ? '🧭' : '🏛️') });
+  ENTRIES.push({ floor: fl.floor, zone: z, name: z.name, key: norm(z.name + ' ' + (z.type === 'restroom' ? 'дәретхана туалет wc' : z.type === 'cafe' ? 'столовая асхана тамақтану' : z.type === 'gym' ? 'спортзал спорт зал спортзал жаттығу' : z.type === 'library' ? 'библиотека кітапхана оқу залы' : z.type === 'med' ? 'медпункт медициналық кабинет дәрігер мед' : z.type === 'assembly' ? 'акт залы актовый мәжіліс' : z.type === 'exit' ? 'кіреберіс кіру шығу осындасыз' : z.type === 'room' ? 'кабинет сынып' : '')), icon: ZICON[z.type] || (z.type === 'room' ? '🚪' : z.type === 'corridor' ? '🧭' : '🏛️') });
 }));
 const sInput = $('search-input'), sRes = $('search-results');
 function searchList(q) {
@@ -410,39 +410,45 @@ function teleport(floor, x, y, label) {
 }
 function findZone(floor, name) { const fl = floors[floor - 1]; const n = norm(name); return fl.zones.find((z) => z.name === name) || fl.zones.find((z) => norm(z.name) === n || norm(z.name).includes(n)); }
 const PRESETS = [
-  ['Негізгі кіреберіс (1-қабат)', 1, 'Негізгі кіреберіс'],
-  ['Орталық вестибюль / Гардероб', 1, 'Орталық вестибюль / Гардероб'],
-  ['Актовый зал (1-қабат)', 1, 'Актовый зал'],
-  ['Асхана (Батыс қанат)', 1, 'Асхана'],
-  ['105 кабинет', 1, '105 кабинет'],
-  ['Спорт залы (2-қабат)', 2, 'Спорт залы (Үлкен зал)'],
+  ['1 Спортзал (1-қабат)', 1, '1 Спортзал'],
+  ['2 Асхана (1-қабат)', 1, '2 Асхана'],
+  ['3 Кітапхана (1-қабат)', 1, '3 Кітапхана'],
+  ['4 Акт залы (1-қабат)', 1, '4 Акт залы'],
+  ['5 Медициналық кабинет (1-қабат)', 1, '5 Медициналық кабинет'],
+  ['6 Баспалдақ (1-қабат)', 1, '6 Баспалдақ'],
+  ['7 Сіз осындасыз (Басты кіреберіс)', 1, '7 Сіз осындасыз (Басты кіреберіс)'],
+  ['105 кабинет (1-қабат)', 1, '105 кабинет'],
   ['Мұғалімдер залы (2-қабат)', 2, 'Мұғалімдер залы (Учительская)'],
-  ['204 кабинет', 2, '204 кабинет'],
-  ['Кітапхана және оқу залы (3-қабат)', 3, 'Кітапхана және оқу залы'],
+  ['204 кабинет (2-қабат)', 2, '204 кабинет'],
   ['IT зертханасы (3-қабат)', 3, 'IT зертханасы және бағдарламалау'],
   ['Робототехника және STEM (3-қабат)', 3, 'Робототехника және STEM орталығы'],
-  ['305 кабинет', 3, '305 кабинет'],
+  ['305 кабинет (3-қабат)', 3, '305 кабинет'],
 ];
 PRESETS.forEach(([label, f, name]) => { const b = document.createElement('button'); b.textContent = '📍 ' + label;
   b.onclick = () => { const z = findZone(f, name); if (z) { teleport(f, z.cx, z.cy, label); closeQR(); } }; $('sim-list').appendChild(b); });
 function handleSpotName(spot) {
   if (!spot) return false;
   const ALIASES = {
-    'entrance': { floor: 1, name: 'Орталық вестибюль / Гардероб', label: 'Басты кіреберіс' },
-    'kireberis': { floor: 1, name: 'Орталық вестибюль / Гардероб', label: 'Басты кіреберіс' },
-    'vestibule': { floor: 1, name: 'Орталық вестибюль / Гардероб', label: 'Орталық вестибюль' },
-    'cafe': { floor: 1, name: 'Асхана', label: 'Мектеп асханасы' },
-    'canteen': { floor: 1, name: 'Асхана', label: 'Мектеп асханасы' },
-    'asxana': { floor: 1, name: 'Асхана', label: 'Мектеп асханасы' },
-    'ashana': { floor: 1, name: 'Асхана', label: 'Мектеп асханасы' },
-    'assembly': { floor: 1, name: 'Актовый зал', label: 'Актовый зал' },
-    'aktovyi': { floor: 1, name: 'Актовый зал', label: 'Актовый зал' },
-    'akt': { floor: 1, name: 'Актовый зал', label: 'Актовый зал' },
-    'gym': { floor: 2, name: 'Спорт залы (Үлкен зал)', label: 'Спорт залы' },
-    'sport': { floor: 2, name: 'Спорт залы (Үлкен зал)', label: 'Спорт залы' },
-    'sportzal': { floor: 2, name: 'Спорт залы (Үлкен зал)', label: 'Спорт залы' },
-    'library': { floor: 3, name: 'Кітапхана және оқу залы', label: 'Кітапхана' },
-    'kitapxana': { floor: 3, name: 'Кітапхана және оқу залы', label: 'Кітапхана' }
+    'entrance': { floor: 1, name: '7 Сіз осындасыз (Басты кіреберіс)', label: '7 Сіз осындасыз (Басты кіреберіс)' },
+    'kireberis': { floor: 1, name: '7 Сіз осындасыз (Басты кіреберіс)', label: '7 Сіз осындасыз (Басты кіреберіс)' },
+    'vestibule': { floor: 1, name: '7 Сіз осындасыз (Басты кіреберіс)', label: '7 Сіз осындасыз' },
+    'cafe': { floor: 1, name: '2 Асхана', label: '2 Асхана' },
+    'canteen': { floor: 1, name: '2 Асхана', label: '2 Асхана' },
+    'asxana': { floor: 1, name: '2 Асхана', label: '2 Асхана' },
+    'ashana': { floor: 1, name: '2 Асхана', label: '2 Асхана' },
+    'assembly': { floor: 1, name: '4 Акт залы', label: '4 Акт залы' },
+    'aktovyi': { floor: 1, name: '4 Акт залы', label: '4 Акт залы' },
+    'akt': { floor: 1, name: '4 Акт залы', label: '4 Акт залы' },
+    'gym': { floor: 1, name: '1 Спортзал', label: '1 Спортзал' },
+    'sport': { floor: 1, name: '1 Спортзал', label: '1 Спортзал' },
+    'sportzal': { floor: 1, name: '1 Спортзал', label: '1 Спортзал' },
+    'library': { floor: 1, name: '3 Кітапхана', label: '3 Кітапхана' },
+    'kitapxana': { floor: 1, name: '3 Кітапхана', label: '3 Кітапхана' },
+    'med': { floor: 1, name: '5 Медициналық кабинет', label: '5 Медициналық кабинет' },
+    'medpunkt': { floor: 1, name: '5 Медициналық кабинет', label: '5 Медициналық кабинет' },
+    'stairs': { floor: 1, name: '6 Баспалдақ', label: '6 Баспалдақ' },
+    'baspaldak': { floor: 1, name: '6 Баспалдақ', label: '6 Баспалдақ' },
+    'here': { floor: 1, name: '7 Сіз осындасыз (Басты кіреберіс)', label: '7 Сіз осындасыз' }
   };
 
   const key = String(spot).toLowerCase().trim();
@@ -687,7 +693,16 @@ function drawLabels(fl, z) {
     if (!zn.cx && !zn.cy) continue;
     if (zn.type === 'stairs') { const s = Math.max(15, 4.2 * z) / z; ctx.font = `${s}px sans-serif`; ctx.fillStyle = '#fff'; ctx.fillText('🪜', zn.cx, zn.cy); continue; }
     if (zn.type === 'restroom') { ctx.font = `${Math.max(14, 3.8 * z) / z}px sans-serif`; ctx.fillText('🚻', zn.cx, zn.cy); continue; }
-    if (zn.type === 'exit') { ctx.font = `${Math.max(16, 4.6 * z) / z}px sans-serif`; ctx.fillText('🚪', zn.cx, zn.cy - 2); ctx.font = `700 ${Math.max(10, 2.6 * z) / z}px Outfit,sans-serif`; ctx.fillStyle = '#6ee7b7'; ctx.fillText(zn.name, zn.cx, zn.cy + 4); continue; }
+    if (zn.type === 'exit') {
+      const isHere = zn.name.includes('Сіз осындасыз');
+      const ic = isHere ? '📍' : '🚪';
+      ctx.font = `${Math.max(16, 4.6 * z) / z}px sans-serif`;
+      ctx.fillText(ic, zn.cx, zn.cy - 2);
+      ctx.font = `700 ${Math.max(10, 2.6 * z) / z}px Outfit,sans-serif`;
+      ctx.fillStyle = isHere ? '#f87171' : '#6ee7b7';
+      ctx.fillText(zn.name, zn.cx, zn.cy + 4);
+      continue;
+    }
     if (zn.type === 'room') { if (z < 2.6) continue; ctx.font = `600 ${Math.max(9, 2.5 * z) / z}px Outfit,sans-serif`; ctx.fillStyle = 'rgba(226,244,255,.92)'; ctx.fillText(zn.num, zn.cx, zn.cy); continue; }
     if (zn.type === 'corridor') { if (z < 3.6) continue; ctx.font = `500 ${Math.max(9, 2.1 * z) / z}px Inter,sans-serif`; ctx.fillStyle = 'rgba(148,210,235,.55)'; ctx.fillText(zn.name, zn.cx, zn.cy); continue; }
     const ic = ZICON[zn.type]; const fs = Math.max(12, 3.2 * z) / z;
@@ -741,21 +756,26 @@ function initStartLocation() {
   const to = params.get('to') || params.get('target');
 
   const ALIASES = {
-    'entrance': { floor: 1, name: 'Орталық вестибюль / Гардероб', label: 'Басты кіреберіс' },
-    'kireberis': { floor: 1, name: 'Орталық вестибюль / Гардероб', label: 'Басты кіреберіс' },
-    'vestibule': { floor: 1, name: 'Орталық вестибюль / Гардероб', label: 'Орталық вестибюль' },
-    'cafe': { floor: 1, name: 'Асхана', label: 'Асхана' },
-    'canteen': { floor: 1, name: 'Асхана', label: 'Асхана' },
-    'asxana': { floor: 1, name: 'Асхана', label: 'Асхана' },
-    'ashana': { floor: 1, name: 'Асхана', label: 'Асхана' },
-    'assembly': { floor: 1, name: 'Актовый зал', label: 'Актовый зал' },
-    'aktovyi': { floor: 1, name: 'Актовый зал', label: 'Актовый зал' },
-    'akt': { floor: 1, name: 'Актовый зал', label: 'Актовый зал' },
-    'gym': { floor: 2, name: 'Спорт залы (Үлкен зал)', label: 'Спорт залы' },
-    'sport': { floor: 2, name: 'Спорт залы (Үлкен зал)', label: 'Спорт залы' },
-    'sportzal': { floor: 2, name: 'Спорт залы (Үлкен зал)', label: 'Спорт залы' },
-    'library': { floor: 3, name: 'Кітапхана және оқу залы', label: 'Кітапхана' },
-    'kitapxana': { floor: 3, name: 'Кітапхана және оқу залы', label: 'Кітапхана' }
+    'entrance': { floor: 1, name: '7 Сіз осындасыз (Басты кіреберіс)', label: '7 Сіз осындасыз (Басты кіреберіс)' },
+    'kireberis': { floor: 1, name: '7 Сіз осындасыз (Басты кіреберіс)', label: '7 Сіз осындасыз (Басты кіреберіс)' },
+    'vestibule': { floor: 1, name: '7 Сіз осындасыз (Басты кіреберіс)', label: '7 Сіз осындасыз' },
+    'cafe': { floor: 1, name: '2 Асхана', label: '2 Асхана' },
+    'canteen': { floor: 1, name: '2 Асхана', label: '2 Асхана' },
+    'asxana': { floor: 1, name: '2 Асхана', label: '2 Асхана' },
+    'ashana': { floor: 1, name: '2 Асхана', label: '2 Асхана' },
+    'assembly': { floor: 1, name: '4 Акт залы', label: '4 Акт залы' },
+    'aktovyi': { floor: 1, name: '4 Акт залы', label: '4 Акт залы' },
+    'akt': { floor: 1, name: '4 Акт залы', label: '4 Акт залы' },
+    'gym': { floor: 1, name: '1 Спортзал', label: '1 Спортзал' },
+    'sport': { floor: 1, name: '1 Спортзал', label: '1 Спортзал' },
+    'sportzal': { floor: 1, name: '1 Спортзал', label: '1 Спортзал' },
+    'library': { floor: 1, name: '3 Кітапхана', label: '3 Кітапхана' },
+    'kitapxana': { floor: 1, name: '3 Кітапхана', label: '3 Кітапхана' },
+    'med': { floor: 1, name: '5 Медициналық кабинет', label: '5 Медициналық кабинет' },
+    'medpunkt': { floor: 1, name: '5 Медициналық кабинет', label: '5 Медициналық кабинет' },
+    'stairs': { floor: 1, name: '6 Баспалдақ', label: '6 Баспалдақ' },
+    'baspaldak': { floor: 1, name: '6 Баспалдақ', label: '6 Баспалдақ' },
+    'here': { floor: 1, name: '7 Сіз осындасыз (Басты кіреберіс)', label: '7 Сіз осындасыз' }
   };
 
   let targetFloor = 1;
@@ -788,10 +808,10 @@ function initStartLocation() {
   }
 
   if (!targetX && !targetY) {
-    const defaultZone = findZone(1, 'Негізгі кіреберіс') || findZone(1, 'Орталық вестибюль / Гардероб');
+    const defaultZone = findZone(1, '7 Сіз осындасыз (Басты кіреберіс)') || findZone(1, '105 кабинет') || floors[0].zones[0];
     targetFloor = 1;
     targetX = defaultZone.cx;
-    targetY = defaultZone.cy - 6;
+    targetY = defaultZone.cy;
   }
 
   S.floor = targetFloor;
